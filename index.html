@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lot Size Scaler</title>
+  <style>
+    html, body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: #0b0f14; color: #e6edf3; }
+    .wrap { max-width: 640px; margin: 48px auto; padding: 0 20px; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: 14px; padding: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
+    h1 { font-size: 1.25rem; margin: 0 0 8px; }
+    p.sub { margin: 0 0 16px; color: #9ca3af; font-size: 0.95rem; }
+    label { display: block; margin: 14px 0 8px; color: #cbd5e1; }
+    input[type="number"] { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #334155; background: #0b1220; color: #e6edf3; outline: none; font-size: 1rem; }
+    input[type="number"]:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,.15); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .out { margin-top: 18px; font-size: 1.15rem; padding: 12px 14px; background: #0b1220; border: 1px dashed #334155; border-radius: 10px; }
+    .muted { color: #9ca3af; font-size: 0.9rem; }
+    .note { margin-top: 10px; color: #9ca3af; font-size: 0.85rem; }
+    .footer { margin-top: 18px; font-size: 0.8rem; color: #6b7280; }
+    .small { font-size: 0.9rem; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0b1220; border:1px solid #334155; padding:2px 6px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Lot Size Scaler</h1>
+      <p class="sub">Scale linearly from a baseline (default: <span class="kbd">£303 → 0.01 lots</span>). Output is rounded <em>down</em> to the nearest 0.01 lots.</p>
+
+      <label for="acct">Your account size (£)</label>
+      <input id="acct" type="number" inputmode="decimal" min="0" step="1" placeholder="e.g., 8000" autofocus />
+
+      <div class="row">
+        <div>
+          <label for="baseAmt" class="small">Baseline account (£)</label>
+          <input id="baseAmt" type="number" inputmode="decimal" min="0.01" step="0.01" value="303" />
+        </div>
+        <div>
+          <label for="baseLot" class="small">Baseline lot size</label>
+          <input id="baseLot" type="number" inputmode="decimal" min="0.01" step="0.01" value="0.01" />
+        </div>
+      </div>
+
+      <div class="out" id="result">Scaled lot size: <strong>—</strong></div>
+      <div class="note">Formula: <span class="kbd">lots = FLOOR( (account / baseline_account) × baseline_lot , 0.01 )</span></div>
+      <div class="footer">This file runs locally in your browser — no network, no tracking. Save it and open it offline.</div>
+    </div>
+  </div>
+
+  <script>
+    const acct = document.getElementById('acct');
+    const baseAmt = document.getElementById('baseAmt');
+    const baseLot = document.getElementById('baseLot');
+    const result = document.getElementById('result');
+
+    function floorTo(x, step) {
+      if (!isFinite(x)) return NaN;
+      const inv = 1 / step;
+      return Math.floor(x * inv) / inv;
+    }
+
+    function fmt(n) {
+      if (!isFinite(n)) return '—';
+      return n.toFixed(2);
+    }
+
+    function calc() {
+      const A = parseFloat(acct.value);
+      const B = parseFloat(baseAmt.value);
+      const L0 = parseFloat(baseLot.value);
+
+      if (!(A >= 0) || !(B > 0) || !(L0 > 0)) {
+        result.innerHTML = 'Scaled lot size: <strong>—</strong>';
+        return;
+      }
+
+      const raw = (A / B) * L0;
+      // Round down to nearest 0.01
+      const scaled = floorTo(raw, 0.01);
+      // Clamp to non-negative
+      const out = Math.max(0, scaled);
+
+      result.innerHTML = 'Scaled lot size: <strong>' + fmt(out) + '</strong>';
+    }
+
+    [acct, baseAmt, baseLot].forEach(el => el.addEventListener('input', calc));
+    // Prefill example
+    acct.value = '';
+    calc();
+  </script>
+</body>
+</html>
