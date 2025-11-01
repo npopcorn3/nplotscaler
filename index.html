@@ -5,21 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lot Size Scaler</title>
   <style>
-    html, body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: #0b0f14; color: #e6edf3; }
-    .wrap { max-width: 640px; margin: 48px auto; padding: 0 20px; }
-    .card { background: #111827; border: 1px solid #1f2937; border-radius: 14px; padding: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
-    h1 { font-size: 1.25rem; margin: 0 0 8px; }
-    p.sub { margin: 0 0 16px; color: #9ca3af; font-size: 0.95rem; }
-    label { display: block; margin: 14px 0 8px; color: #cbd5e1; }
-    input[type="number"] { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #334155; background: #0b1220; color: #e6edf3; outline: none; font-size: 1rem; }
-    input[type="number"]:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,.15); }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .out { margin-top: 18px; font-size: 1.15rem; padding: 12px 14px; background: #0b1220; border: 1px dashed #334155; border-radius: 10px; }
-    .muted { color: #9ca3af; font-size: 0.9rem; }
-    .note { margin-top: 10px; color: #9ca3af; font-size: 0.85rem; }
-    .footer { margin-top: 18px; font-size: 0.8rem; color: #6b7280; }
-    .small { font-size: 0.9rem; }
-    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#0b1220; border:1px solid #334155; padding:2px 6px; border-radius:6px; }
+    :root{
+      --bg:#0b0f14;
+      --card:#0f1720;
+      --muted:#9ca3af;
+      --panel:#0b1220;
+      --border:#334155;
+      --accent:#60a5fa;
+      --text:#e6edf3;
+      --card-border:#1f2937;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:760px;margin:36px auto;padding:0 20px}
+    .card{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,0.35)}
+    h1{font-size:1.25rem;margin:0 0 6px}
+    p.sub{margin:0 0 18px;color:var(--muted);font-size:0.95rem}
+    label{display:block;margin:10px 0 8px;color:#cbd5e1;font-size:0.95rem}
+    input[type="number"], input[type="text"]{
+      display:block;
+      width:100%;
+      box-sizing:border-box;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--text);
+      outline:none;
+      font-size:1rem;
+    }
+    input[type="number"]:focus, input[type="text"]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(96,165,250,.12)}
+    .row{display:grid;grid-template-columns:1fr .66fr;gap:12px}
+    /* make the baseline pair a little tighter like your screenshot */
+    .smallRow{display:grid;grid-template-columns:1fr .46fr;gap:12px;margin-top:6px}
+    .out{margin-top:16px;padding:14px;border-radius:12px;background:var(--panel);border:1px dashed var(--border);font-size:1.05rem}
+    .muted{color:var(--muted);font-size:0.92rem}
+    .note{margin-top:10px;color:var(--muted);font-size:0.85rem}
+    .footer{margin-top:18px;font-size:0.8rem;color:#6b7280}
+    .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;background:var(--panel);border:1px solid var(--border);padding:3px 7px;border-radius:6px}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:8px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.95rem}
+    th{color:var(--muted);font-weight:600}
+    .sm{font-size:0.88rem;color:var(--muted)}
+    .inline{display:inline-block;vertical-align:middle}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    .right{text-align:right}
+    .label-row{display:flex;gap:8px;align-items:center}
+    .small{font-size:0.9rem;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -29,9 +60,9 @@
       <p class="sub">Scale linearly from a baseline (default: <span class="kbd">£303 → 0.01 lots</span>). Output is rounded <em>down</em> to the nearest 0.01 lots.</p>
 
       <label for="acct">Your account size (£)</label>
-      <input id="acct" type="number" inputmode="decimal" min="0" step="1" placeholder="e.g., 8000" autofocus />
+      <input id="acct" type="number" inputmode="decimal" min="0" step="1" placeholder="e.g., 8500" />
 
-      <div class="row">
+      <div class="smallRow" style="margin-top:8px">
         <div>
           <label for="baseAmt" class="small">Baseline account (£)</label>
           <input id="baseAmt" type="number" inputmode="decimal" min="0.01" step="0.01" value="303" />
@@ -42,9 +73,36 @@
         </div>
       </div>
 
+      <div class="row" style="margin-top:12px">
+        <div>
+          <label for="contract">Contract size (oz per 1 lot)</label>
+          <input id="contract" type="number" inputmode="decimal" min="1" step="1" value="100" />
+          <div class="sm" style="margin-top:6px">Most CFD brokers use 100 oz / lot for XAUUSD. Change if your broker differs.</div>
+        </div>
+
+        <div>
+          <label for="fx">USD → GBP (1 USD = ? GBP)</label>
+          <input id="fx" type="number" inputmode="decimal" min="0.0001" step="0.0001" value="0.80" />
+          <div class="sm" style="margin-top:6px">Enter the current USD→GBP rate you want the calculator to use.</div>
+        </div>
+      </div>
+
       <div class="out" id="result">Scaled lot size: <strong>—</strong></div>
+
+      <div class="grid2">
+        <div>
+          <div class="muted">Profit for XAUUSD moves (USD):</div>
+          <div id="movesTable" class="out" style="padding:10px;background:transparent;border:0"></div>
+        </div>
+
+        <div>
+          <div class="muted">Target percent of account (GBP):</div>
+          <div id="percentTable" class="out" style="padding:10px;background:transparent;border:0"></div>
+        </div>
+      </div>
+
       <div class="note">Formula: <span class="kbd">lots = FLOOR( (account / baseline_account) × baseline_lot , 0.01 )</span></div>
-      <div class="footer">Wish you the best.</div>
+      <div class="footer">Good luck.</div>
     </div>
   </div>
 
@@ -53,40 +111,94 @@
     const baseAmt = document.getElementById('baseAmt');
     const baseLot = document.getElementById('baseLot');
     const result = document.getElementById('result');
+    const contract = document.getElementById('contract'); // oz per lot
+    const fx = document.getElementById('fx'); // USD->GBP
+    const movesTable = document.getElementById('movesTable');
+    const percentTable = document.getElementById('percentTable');
 
     function floorTo(x, step) {
       if (!isFinite(x)) return NaN;
       const inv = 1 / step;
       return Math.floor(x * inv) / inv;
     }
-
-    function fmt(n) {
+    function money(n){
       if (!isFinite(n)) return '—';
-      return n.toFixed(2);
+      const neg = n < 0 ? '-' : '';
+      const abs = Math.abs(n);
+      return neg + '£' + abs.toFixed(2);
+    }
+    function fmt(n, dp=2){
+      if (!isFinite(n)) return '—';
+      return Number(n).toFixed(dp);
     }
 
-    function calc() {
+    function renderMoves(scaledLots, baselineLots, contractSize, usdToGbp){
+      // moves in USD
+      const moves = [1,2,5,7,10];
+      // produce table: Move | Baseline GBP profit | Scaled GBP profit | Mult
+      let html = '<table><thead><tr><th>Move (USD)</th><th>Baseline profit</th><th>Scaled profit</th><th class="right">Scale×</th></tr></thead><tbody>';
+      for (const mv of moves){
+        const baselineUSD = mv * contractSize * baselineLots;
+        const scaledUSD   = mv * contractSize * scaledLots;
+        const baselineGBP = baselineUSD * usdToGbp;
+        const scaledGBP   = scaledUSD * usdToGbp;
+        const mult = baselineGBP === 0 ? '—' : (scaledGBP / baselineGBP).toFixed(2) + '×';
+        html += `<tr><td>${mv} USD</td><td>${money(baselineGBP)}</td><td>${money(scaledGBP)}</td><td class="right">${mult}</td></tr>`;
+      }
+      html += '</tbody></table>';
+      movesTable.innerHTML = html;
+    }
+
+    function renderPercents(account){
+      if (!(account > 0)) { percentTable.innerHTML = '<div class="sm">Enter account value to see percents.</div>'; return; }
+      const ps = [1,2,3,4,5];
+      let html = '<table><thead><tr><th>%</th><th>Value (GBP)</th></tr></thead><tbody>';
+      for (const p of ps){
+        const val = (p/100) * account;
+        html += `<tr><td>${p}%</td><td>${money(val)}</td></tr>`;
+      }
+      html += '</tbody></table>';
+      percentTable.innerHTML = html;
+    }
+
+    function calc(){
       const A = parseFloat(acct.value);
       const B = parseFloat(baseAmt.value);
       const L0 = parseFloat(baseLot.value);
+      const contractSize = parseFloat(contract.value);
+      const usdToGbp = parseFloat(fx.value);
 
-      if (!(A >= 0) || !(B > 0) || !(L0 > 0)) {
+      if (!(B > 0) || !(L0 > 0) || !isFinite(contractSize) || !isFinite(usdToGbp)){
         result.innerHTML = 'Scaled lot size: <strong>—</strong>';
+        movesTable.innerHTML = '<div class="sm">Enter valid parameters to see moves.</div>';
+        percentTable.innerHTML = '<div class="sm">Enter account value to see percents.</div>';
+        return;
+      }
+
+      if (!(A >= 0)) {
+        result.innerHTML = 'Scaled lot size: <strong>—</strong>';
+        movesTable.innerHTML = '<div class="sm">Enter account value to see moves.</div>';
+        percentTable.innerHTML = '<div class="sm">Enter account value to see percents.</div>';
         return;
       }
 
       const raw = (A / B) * L0;
-      // Round down to nearest 0.01
       const scaled = floorTo(raw, 0.01);
-      // Clamp to non-negative
       const out = Math.max(0, scaled);
 
-      result.innerHTML = 'Scaled lot size: <strong>' + fmt(out) + '</strong>';
+      result.innerHTML = 'Scaled lot size: <strong>' + fmt(out,2) + '</strong>';
+
+      // render tables using baseline lot L0 and scaled 'out'
+      renderMoves(out, L0, contractSize, usdToGbp);
+      // render percent table for the account entered (A)
+      renderPercents(A);
     }
 
-    [acct, baseAmt, baseLot].forEach(el => el.addEventListener('input', calc));
-    // Prefill example
+    [acct, baseAmt, baseLot, contract, fx].forEach(el => el.addEventListener('input', calc));
+    // sensible prefills
     acct.value = '';
+    contract.value = '100';
+    fx.value = '0.80';
     calc();
   </script>
 </body>
